@@ -1,0 +1,43 @@
+services:
+  payload:
+    # 1. Use the image built by GitHub Actions (not a generic node image)
+    image: ghcr.io/${GITHUB_REPOSITORY}:latest
+    
+    # 2. Restart automatically if it crashes
+    restart: always
+    
+    # 3. Inject environment variables (Secrets)
+    env_file: .env
+    environment:
+      # Connect to the SHARED mongo container, not a local one
+      # We use the internal Docker DNS name 'shared_mongo'
+      DATABASE_URI: mongodb://root:${MONGO_PASS}@shared_mongo:27017/$nwpolish_db?authSource=admin
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      NODE_ENV: production
+      port: 3000
+
+    # 4. Traefik Integration (No ports exposed directly!)
+    labels:
+      - "traefik.enable=true"
+      # Router Configuration
+      - "traefik.http.routers.nwpolish.rule=Host(`northwestmetalpolishingservices.co.uk`)"
+      - "traefik.http.routers.nwpolish.entrypoints=websecure"
+      - "traefik.http.routers.nwpolish.tls.certresolver=myresolver"
+      # Service Configuration (Point to internal container port)
+      - "traefik.http.services.nwpolish.loadbalancer.server.port=3000"
+
+    # 5. Connect to the infrastructure networks
+    networks:
+      - proxy_net  # To talk to Traefik
+      - data_net   # To talk to Shared Mongo
+
+    # 6. Persist Media Uploads
+    volumes:
+      - ./media:/app/media
+
+# Define the external networks (pre-created on VPS)
+networks:
+  proxy_net:
+    external: true
+  data_net:
+    external: true

@@ -55,6 +55,12 @@ COPY --from=builder /app/public ./public
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
+
+# Create the media directory and give the nextjs user permissions
+# Replace 'media' with whatever your upload collection slug is (e.g., 'uploads')
+RUN mkdir -p media
+RUN chown nextjs:nodejs media
+
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

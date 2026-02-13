@@ -69,6 +69,11 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    services: Service;
+    projects: Project;
+    'quote-requests': QuoteRequest;
+    pages: Page;
+    'hero-slides': HeroSlide;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +83,11 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'quote-requests': QuoteRequestsSelect<false> | QuoteRequestsSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    'hero-slides': HeroSlidesSelect<false> | HeroSlidesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -87,8 +97,12 @@ export interface Config {
     defaultIDType: string;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -161,6 +175,228 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: string;
+  title: string;
+  slug: string;
+  /**
+   * Short description shown on service cards
+   */
+  description: string;
+  /**
+   * Main content for the service page
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Main service image shown on cards
+   */
+  image?: (string | null) | Media;
+  /**
+   * Gallery images for this service (up to 15 images)
+   */
+  gallery?:
+    | {
+        image: string | Media;
+        /**
+         * Brief description of this image
+         */
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Icon name or emoji (e.g., ⚡ or laser)
+   */
+  icon?: string | null;
+  featured?: boolean | null;
+  order?: number | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Add images to showcase your work in the gallery.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: string;
+  /**
+   * Internal name for this gallery item (not shown publicly)
+   */
+  title: string;
+  /**
+   * Add one or more images to display in the gallery
+   */
+  images: {
+    image: string | Media;
+    id?: string | null;
+  }[];
+  /**
+   * Show this on the homepage
+   */
+  featured?: boolean | null;
+  /**
+   * Lower numbers appear first
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quote-requests".
+ */
+export interface QuoteRequest {
+  id: string;
+  company: string;
+  contactName: string;
+  email: string;
+  phone?: string | null;
+  message: string;
+  status: 'new' | 'contacted' | 'quote-sent' | 'completed' | 'archived';
+  /**
+   * Internal notes
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  title: string;
+  slug: string;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-slides".
+ */
+export interface HeroSlide {
+  id: string;
+  /**
+   * Only active slides will be shown in the slideshow
+   */
+  active?: boolean | null;
+  /**
+   * Lower numbers appear first
+   */
+  order?: number | null;
+  /**
+   * e.g., "Precision"
+   */
+  title: string;
+  /**
+   * e.g., "Laser Cutting"
+   */
+  accent: string;
+  /**
+   * e.g., "Stainless Steel"
+   */
+  subtitle: string;
+  /**
+   * Brief description of this service
+   */
+  description: string;
+  /**
+   * Font size for the title in rem (default: 2.7)
+   */
+  titleSize?: number | null;
+  /**
+   * Font size for the description in rem (default: 1.5)
+   */
+  descriptionSize?: number | null;
+  /**
+   * Optional - a metallic background will be used if no image is provided
+   */
+  backgroundImage?: (string | null) | Media;
+  /**
+   * Dark overlay opacity (0-100). Use higher values for images, lower for metallic background.
+   */
+  overlayOpacity?: number | null;
+  /**
+   * Blur amount in pixels for the background image (0-20). Only applies when a background image is set.
+   */
+  backgroundBlur?: number | null;
+  showLogo?: boolean | null;
+  showTitle?: boolean | null;
+  showDescription?: boolean | null;
+  showGetQuote?: boolean | null;
+  showViewWork?: boolean | null;
+  stats?:
+    | {
+        /**
+         * e.g., "±0.1", "25", "3×1.5"
+         */
+        number: string;
+        /**
+         * e.g., "mm", "m", "t" (leave empty if not needed)
+         */
+        unit?: string | null;
+        /**
+         * e.g., "Precision Tolerance"
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -190,6 +426,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: string | Service;
+      } | null)
+    | ({
+        relationTo: 'projects';
+        value: string | Project;
+      } | null)
+    | ({
+        relationTo: 'quote-requests';
+        value: string | QuoteRequest;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'hero-slides';
+        value: string | HeroSlide;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -275,6 +531,118 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  content?: T;
+  image?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  icon?: T;
+  featured?: T;
+  order?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects_select".
+ */
+export interface ProjectsSelect<T extends boolean = true> {
+  title?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  featured?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quote-requests_select".
+ */
+export interface QuoteRequestsSelect<T extends boolean = true> {
+  company?: T;
+  contactName?: T;
+  email?: T;
+  phone?: T;
+  message?: T;
+  status?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  content?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-slides_select".
+ */
+export interface HeroSlidesSelect<T extends boolean = true> {
+  active?: T;
+  order?: T;
+  title?: T;
+  accent?: T;
+  subtitle?: T;
+  description?: T;
+  titleSize?: T;
+  descriptionSize?: T;
+  backgroundImage?: T;
+  overlayOpacity?: T;
+  backgroundBlur?: T;
+  showLogo?: T;
+  showTitle?: T;
+  showDescription?: T;
+  showGetQuote?: T;
+  showViewWork?: T;
+  stats?:
+    | T
+    | {
+        number?: T;
+        unit?: T;
+        label?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -312,6 +680,214 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: string;
+  branding?: {
+    /**
+     * Upload your logo image. This will replace text logos throughout the site (navigation, footer, splash screen).
+     */
+    logo?: (string | null) | Media;
+    /**
+     * Height of the logo in navigation and footer (default: 50px)
+     */
+    logoHeight?: number | null;
+    /**
+     * Height of the logo on the splash screen (default: 120px)
+     */
+    splashLogoHeight?: number | null;
+    /**
+     * Logo displayed on the hero section. If not set, the site logo will be used.
+     */
+    heroLogo?: (string | null) | Media;
+    /**
+     * Height of the logo on the hero section (default: 80px)
+     */
+    heroLogoHeight?: number | null;
+    /**
+     * Static: logo stays on hero. Animated: logo appears first, then fades out and description fades in.
+     */
+    heroLogoMode?: ('static' | 'animated') | null;
+    /**
+     * Choose whether the hero background uses per-slide images or auto-cycles through your "Our Work" project gallery images.
+     */
+    heroBackgroundMode?: ('slides' | 'gallery') | null;
+    /**
+     * Used for alt text and fallback when logo is not set
+     */
+    siteName?: string | null;
+    /**
+     * Short description shown in footer and splash screen
+     */
+    tagline?: string | null;
+  };
+  contactInfo?: {
+    /**
+     * Phone number as displayed to visitors
+     */
+    phone?: string | null;
+    /**
+     * Phone number used in tel: links (no spaces or formatting)
+     */
+    phoneLink?: string | null;
+    email?: string | null;
+    location?: string | null;
+    businessHours?: string | null;
+    /**
+     * Full Google Maps embed URL for the contact page map
+     */
+    googleMapsEmbed?: string | null;
+  };
+  /**
+   * Editable text for sections on the home page.
+   */
+  homeContent?: {
+    /**
+     * Small uppercase label above the services title
+     */
+    servicesLabel?: string | null;
+    servicesTitle?: string | null;
+    servicesDescription?: string | null;
+    servicesButtonText?: string | null;
+    ctaTitle?: string | null;
+    ctaDescription?: string | null;
+    ctaButtonText?: string | null;
+  };
+  /**
+   * Content displayed in the site footer on every page.
+   */
+  footerContent?: {
+    contactHeading?: string | null;
+    contactText?: string | null;
+    contactLinkText?: string | null;
+    /**
+     * Leave blank to use site name. Year is added automatically.
+     */
+    copyrightText?: string | null;
+  };
+  /**
+   * SEO settings for each static page. Leave blank to use defaults.
+   */
+  pageSeo?: {
+    home?: {
+      /**
+       * Page title for search engines and browser tabs
+       */
+      metaTitle?: string | null;
+      /**
+       * Description shown in search engine results (150-160 characters recommended)
+       */
+      metaDescription?: string | null;
+      /**
+       * Image shown when shared on social media (1200x630px recommended)
+       */
+      ogImage?: (string | null) | Media;
+    };
+    services?: {
+      metaTitle?: string | null;
+      metaDescription?: string | null;
+      ogImage?: (string | null) | Media;
+    };
+    ourWork?: {
+      metaTitle?: string | null;
+      metaDescription?: string | null;
+      ogImage?: (string | null) | Media;
+    };
+    contact?: {
+      metaTitle?: string | null;
+      metaDescription?: string | null;
+      ogImage?: (string | null) | Media;
+    };
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  branding?:
+    | T
+    | {
+        logo?: T;
+        logoHeight?: T;
+        splashLogoHeight?: T;
+        heroLogo?: T;
+        heroLogoHeight?: T;
+        heroLogoMode?: T;
+        heroBackgroundMode?: T;
+        siteName?: T;
+        tagline?: T;
+      };
+  contactInfo?:
+    | T
+    | {
+        phone?: T;
+        phoneLink?: T;
+        email?: T;
+        location?: T;
+        businessHours?: T;
+        googleMapsEmbed?: T;
+      };
+  homeContent?:
+    | T
+    | {
+        servicesLabel?: T;
+        servicesTitle?: T;
+        servicesDescription?: T;
+        servicesButtonText?: T;
+        ctaTitle?: T;
+        ctaDescription?: T;
+        ctaButtonText?: T;
+      };
+  footerContent?:
+    | T
+    | {
+        contactHeading?: T;
+        contactText?: T;
+        contactLinkText?: T;
+        copyrightText?: T;
+      };
+  pageSeo?:
+    | T
+    | {
+        home?:
+          | T
+          | {
+              metaTitle?: T;
+              metaDescription?: T;
+              ogImage?: T;
+            };
+        services?:
+          | T
+          | {
+              metaTitle?: T;
+              metaDescription?: T;
+              ogImage?: T;
+            };
+        ourWork?:
+          | T
+          | {
+              metaTitle?: T;
+              metaDescription?: T;
+              ogImage?: T;
+            };
+        contact?:
+          | T
+          | {
+              metaTitle?: T;
+              metaDescription?: T;
+              ogImage?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
